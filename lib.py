@@ -17,7 +17,7 @@ COLORS = [[0.75,0,0],[0,0.75,0],[0,0,0.75],[0.5,0.5,0],[0.5,0,0.5],[0,0.5,0.5],[
 
 # Function definitions
 def landmark_coordinates(maps: torch.Tensor, device: torch.device) -> \
-        (torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor):
+        tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
     """
     Calculate the coordinates of the landmarks from the attention maps
     Parameters
@@ -51,7 +51,7 @@ def landmark_coordinates(maps: torch.Tensor, device: torch.device) -> \
     return loc_x, loc_y, grid_x, grid_y
 
 
-def rigid_transform(img: torch.Tensor, angle: int, translate: [int], scale: float, invert: bool=False):
+def rigid_transform(img: torch.Tensor, angle: int, translate: list[int], scale: float, invert: bool=False):
     """
     Affine transforms input image
     Parameters
