@@ -70,8 +70,8 @@ def main():
     weights = ResNet101_Weights.DEFAULT
     basenet = resnet101(weights=weights)
 
-    net = IndividualLandmarkNet(basenet, args.num_parts, num_classes=num_cls)
-    # net = IndividualLandmarkNetModified(basenet, args.num_parts, num_classes=num_cls)
+    # net = IndividualLandmarkNet(basenet, args.num_parts, num_classes=num_cls)
+    net = IndividualLandmarkNetModified(basenet, args.num_parts, num_classes=num_cls)
 
     if args.pretrained_model_path:
         if not os.path.exists(f'./results_{args.model_name}'):
