@@ -106,7 +106,7 @@ def equiv_loss(X: torch.Tensor, maps: torch.Tensor, net: torch.nn.Module, device
 
 def train(net: torch.nn.Module, optimizer: torch.optim, train_loader: torch.utils.data.DataLoader,
           device: torch.device, epoch: int, epoch_leftoff: int, loss_fn: torch.nn.Module, loss_hyperparams: dict,
-          writer: torch.utils.tensorboard.SummaryWriter, all_losses: [float] = None) -> (torch.nn.Module, [float]):
+          writer: torch.utils.tensorboard.SummaryWriter, all_losses: list[float] = None) -> tuple[torch.nn.Module, list[float]]:
     """
     Model trainer, saves losses to file
     Parameters

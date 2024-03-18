@@ -1,0 +1,12 @@
+torch
+torchvision
+torchaudio
+jupyterlab
+matplotlib
+pandas
+scipy
+scikit-learn
+scikit-image
+pycocotools
+tensorboard
+tqdm
