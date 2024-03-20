@@ -139,7 +139,8 @@ class IndividualLandmarkNetModified(torch.nn.Module):
 
     def forward(self, x: torch.Tensor):
         """
-
+        Modified with different attention calculation
+        
         Parameters
         ----------
         x: torch.Tensor
