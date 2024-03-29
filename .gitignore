@@ -3,3 +3,4 @@ cub
 *.zip
 *.tgz
 *.tsv
+.DS_Store
