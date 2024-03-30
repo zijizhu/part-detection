@@ -72,7 +72,7 @@ def main():
 
     # net = IndividualLandmarkNet(basenet, args.num_parts, num_classes=num_cls)
     # net = IndividualLandmarkNetModified(basenet, args.num_parts, num_classes=num_cls)
-    net = PartCEM('resnet101', args.num_parts, num_classes=num_cls)
+    net = PartCEM(basenet, args.num_parts, num_classes=num_cls)
 
     if args.pretrained_model_path:
         if not os.path.exists(f'./results_{args.model_name}'):
