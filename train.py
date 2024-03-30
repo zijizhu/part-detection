@@ -141,7 +141,8 @@ def train(net: torch.nn.Module, optimizer: torch.optim, train_loader: torch.util
     """
     # Training
     if all_losses:
-        running_loss_conc, running_loss_pres, running_loss_class, running_loss_equiv, running_loss_orth = all_losses
+        # running_loss_conc, running_loss_pres, running_loss_class, running_loss_equiv, running_loss_orth = all_losses
+        running_loss_conc, running_loss_pres, running_loss_class, running_loss_orth = all_losses
     elif not all_losses and epoch != 0:
         print(
             'Please pass the losses of the previous epoch to the training function')
@@ -157,7 +158,7 @@ def train(net: torch.nn.Module, optimizer: torch.optim, train_loader: torch.util
         lab = lab.to(device)
         landmark_features, maps, scores = net(X.to(device))
         # Equivariance loss: calculate rotated landmarks distance
-        loss_equiv = equiv_loss(X, maps, net, device, net.num_landmarks) * l_equiv
+        # loss_equiv = equiv_loss(X, maps, net, device, net.num_landmarks) * l_equiv
 
         # Classification loss
         loss_class = loss_fn(scores[:, :, 0:-1].mean(-1), lab).mean()
@@ -184,7 +185,9 @@ def train(net: torch.nn.Module, optimizer: torch.optim, train_loader: torch.util
         # Orthogonality loss
         loss_orth = orth_loss(net.num_landmarks, landmark_features, device) * l_orth
 
-        total_loss = loss_conc + loss_pres + loss_orth + loss_equiv + loss_class
+        # total_loss = loss_conc + loss_pres + loss_orth + loss_equiv + loss_class
+        total_loss = loss_conc + loss_pres + loss_orth + loss_class
+
         total_loss.backward()
         optimizer.step()
         optimizer.zero_grad()
@@ -193,13 +196,13 @@ def train(net: torch.nn.Module, optimizer: torch.optim, train_loader: torch.util
             running_loss_conc = loss_conc.item()
             running_loss_pres = loss_pres.item()
             running_loss_class = loss_class.item()
-            running_loss_equiv = loss_equiv.item()
+            # running_loss_equiv = loss_equiv.item()
             running_loss_orth = loss_orth.item()
         else:
             running_loss_conc = 0.99 * running_loss_conc + 0.01 * loss_conc.item()
             running_loss_pres = 0.99 * running_loss_pres + 0.01 * loss_pres.item()
             running_loss_class = 0.99 * running_loss_class + 0.01 * loss_class.item()
-            running_loss_equiv = 0.99 * running_loss_equiv + 0.01 * loss_equiv.item()
+            # running_loss_equiv = 0.99 * running_loss_equiv + 0.01 * loss_equiv.item()
             running_loss_orth = 0.99 * running_loss_orth + 0.01 * loss_orth.item()
         pbar.update()
 
@@ -207,12 +210,13 @@ def train(net: torch.nn.Module, optimizer: torch.optim, train_loader: torch.util
     writer.add_scalar('Concentration loss', running_loss_conc, epoch)
     writer.add_scalar('Presence loss', running_loss_pres, epoch)
     writer.add_scalar('Classification loss', running_loss_class, epoch)
-    writer.add_scalar('Equivariance loss', running_loss_equiv, epoch)
+    # writer.add_scalar('Equivariance loss', running_loss_equiv, epoch)
     writer.add_scalar('Orthogonality loss', running_loss_orth, epoch)
     writer.add_scalar('Training Accuracy', top1acc, epoch)
 
     pbar.close()
-    all_losses = running_loss_conc, running_loss_pres, running_loss_class, running_loss_equiv, running_loss_orth
+    # all_losses = running_loss_conc, running_loss_pres, running_loss_class, running_loss_equiv, running_loss_orth
+    all_losses = running_loss_conc, running_loss_pres, running_loss_class, running_loss_orth
     writer.flush()
     return net, all_losses
 
