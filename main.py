@@ -1,6 +1,6 @@
 from lib import get_epoch
 from datasets import PartImageNetDataset, CUBDataset, CelebA
-from nets import IndividualLandmarkNet, IndividualLandmarkNetModified
+from nets import IndividualLandmarkNet, IndividualLandmarkNetModified, PartCEM
 import os
 import argparse
 import numpy as np
@@ -71,7 +71,8 @@ def main():
     basenet = resnet101(weights=weights)
 
     # net = IndividualLandmarkNet(basenet, args.num_parts, num_classes=num_cls)
-    net = IndividualLandmarkNetModified(basenet, args.num_parts, num_classes=num_cls)
+    # net = IndividualLandmarkNetModified(basenet, args.num_parts, num_classes=num_cls)
+    net = PartCEM('resnet101', args.num_parts, num_classes=num_cls)
 
     if args.pretrained_model_path:
         if not os.path.exists(f'./results_{args.model_name}'):

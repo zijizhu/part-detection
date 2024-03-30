@@ -1,4 +1,6 @@
+import timm
 import torch
+from torch import nn
 import torch.nn.functional as F
 from torch.nn import BatchNorm2d, Softmax2d
 from torchvision.models.resnet import ResNet
@@ -174,11 +176,11 @@ class IndividualLandmarkNetModified(torch.nn.Module):
         maps = torch.cdist(x_flat, self.landmarks, p=2) # shape: [b, h*w, nlandmarks]
         maps = maps.permute(0, 2, 1).reshape(b, -1, h, w) # shape: [b, nlandmarks, h, w]
         # Softmax so that the attention maps for each pixel add up to 1
-        maps = self.softmax(-maps)
+        maps = self.softmax(-maps) # shape: [b, nlandmarks, h, w]
 
         # Use maps to get weighted average features per landmark
         feature_tensor = x
-        all_features = ((maps).unsqueeze(1) * feature_tensor.unsqueeze(2)).mean(-1).mean(-1)
+        all_features = ((maps).unsqueeze(1) * feature_tensor.unsqueeze(2)).mean(-1).mean(-1) # shape: [b, 2048 + 1024, nlandmarks]
 
         # Classification based on the landmarks
         all_features_modulated = all_features * self.modulation
@@ -186,3 +188,35 @@ class IndividualLandmarkNetModified(torch.nn.Module):
         scores = self.fc_class_landmarks(all_features_modulated.permute(0, 2, 1)).permute(0, 2, 1)
 
         return all_features, maps, scores
+    
+
+class PartCEM(nn.Module):
+    def __init__(self, backbone='resnet101', num_parts=7, num_classes=200, dropout=0.3) -> None:
+        super(PartCEM, self).__init__()
+        self.k = num_parts + 1
+        self.backbone = timm.create_model(backbone, pretrained=True)
+        self.dim = self.backbone.fc.weight.shape[-1]
+
+        self.prototypes = nn.Parameter(torch.randn(self.k, self.dim))
+        self.modulations = torch.nn.Parameter(torch.ones((1, self.k, self.dim)))
+
+        self.softmax2d = nn.Softmax2d()
+        self.dropout = nn.Dropout1d(p=dropout)
+        self.class_fc = nn.Linear(self.dim, num_classes)
+    
+    def forward(self, x):
+        x = self.backbone.forward_features(x)
+        b, c, h, w = x.shape
+
+        b, c, h, w = x.shape
+        x_flat = x.view(b, c, h*w).permute(0, 2, 1) # shape: [b,h*w,c]
+        maps = torch.cdist(x_flat, self.prototypes, p=2) # shape: [b,h*w,k]
+        maps = maps.permute(0, 2, 1).reshape(b, -1, h, w) # shape: [b,k,h,w]
+        maps = self.softmax2d(-maps) # shape: [b,k,h,w]
+
+        parts = torch.einsum('bkhw,bchw->bkchw', maps, x).mean((-1,-2)) # shape: [b,k,h,w], [b,c,h,w] -> [b,k,c]
+        parts_modulated = parts * self.modulations # shape: [b,k,c]
+        parts_modulated_dropped = self.dropout(parts_modulated) # shape: [b,k,c]
+        class_logits = self.class_fc(parts_modulated_dropped) # shape: [b,k,|y|]
+
+        return parts.permute(0, 2, 1), maps, class_logits.permute(0, 2, 1)
