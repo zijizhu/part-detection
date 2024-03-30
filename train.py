@@ -208,11 +208,15 @@ def train(net: torch.nn.Module, optimizer: torch.optim, train_loader: torch.util
 
     top1acc = np.mean(np.array(top_class))
     writer.add_scalar('Concentration loss', running_loss_conc, epoch)
+    print('Concentration loss:', running_loss_conc)
     writer.add_scalar('Presence loss', running_loss_pres, epoch)
-    writer.add_scalar('Classification loss', running_loss_class, epoch)
+    print('Presence loss:', running_loss_pres)
+    print('Classification loss:', running_loss_class)
     # writer.add_scalar('Equivariance loss', running_loss_equiv, epoch)
     writer.add_scalar('Orthogonality loss', running_loss_orth, epoch)
+    print('Orthogonality loss:', running_loss_orth)
     writer.add_scalar('Training Accuracy', top1acc, epoch)
+    print('Training Accuracy:', top1acc)
 
     pbar.close()
     # all_losses = running_loss_conc, running_loss_pres, running_loss_class, running_loss_equiv, running_loss_orth
@@ -270,6 +274,7 @@ def validation(device, net, val_loader, epoch, model_name, save_figures, writer)
 
     top1acc = np.mean(np.array(top_class))
     writer.add_scalar('Validation Accuracy', top1acc, epoch)
+    print('Validation Accuracy', top1acc)
     pbar.close()
     writer.flush()
 
