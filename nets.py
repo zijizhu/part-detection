@@ -191,8 +191,9 @@ class IndividualLandmarkNetModified(torch.nn.Module):
     
 
 class PartCEM(nn.Module):
-    def __init__(self, backbone='resnet101', num_parts=7, num_classes=200, dropout=0.3) -> None:
+    def __init__(self, backbone='resnet101', num_parts=8, num_classes=200, dropout=0.3) -> None:
         super(PartCEM, self).__init__()
+        self.num_landmarks = num_parts
         self.k = num_parts + 1
         self.backbone = timm.create_model(backbone, pretrained=True)
         self.dim = self.backbone.fc.weight.shape[-1]
