@@ -87,8 +87,10 @@ def main():
 
     all_losses = []
 
-    high_lr_layers = ["modulation"]
-    med_lr_layers = ["fc_class_landmarks"]
+    # high_lr_layers = ["modulation"]
+    # med_lr_layers = ["fc_class_landmarks"]
+    high_lr_layers = ["modulationw"]
+    med_lr_layers = ["class_fc"]
 
     # First entry contains parameters with high lr, second with medium lr, third with low lr
     param_dict = [{'params': [], 'lr': args.lr * 100},
