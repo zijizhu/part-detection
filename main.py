@@ -89,7 +89,7 @@ def main():
 
     # high_lr_layers = ["modulation"]
     # med_lr_layers = ["fc_class_landmarks"]
-    high_lr_layers = ["modulationw"]
+    high_lr_layers = ["modulations", "prototypes"]
     med_lr_layers = ["class_fc"]
 
     # First entry contains parameters with high lr, second with medium lr, third with low lr
